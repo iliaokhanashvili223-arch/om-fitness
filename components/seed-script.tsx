@@ -2,12 +2,12 @@
  * Seeds realistic demo data for BOTH profiles into localStorage on first load.
  * Rendered as a plain inline <script> so it runs BEFORE React hydration — that
  * way the storage hooks read seeded values on their first pass. Runs once
- * (guarded by `fos:seeded:v3`); also clears any legacy un-namespaced keys.
+ * (guarded by `fos:seeded:v4`); also clears any legacy un-namespaced keys.
  */
 const SEED = `
 (function () {
   try {
-    if (localStorage.getItem('fos:seeded:v3')) return;
+    if (localStorage.getItem('fos:seeded:v4')) return;
     var pad = function (n) { return String(n).padStart(2, '0'); };
     var key = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
     var today = new Date();
@@ -47,13 +47,13 @@ const SEED = `
     }
     localStorage.setItem('fos:me:workouts', JSON.stringify(meWorkouts));
 
-    var pIds = ['p-core', 'p-flow', 'p-mobility', 'p-lower', 'p-full'];
-    var pTitles = ['Pilates Core', 'Pilates Flow', 'Mobility Flow', 'Lower Body Pilates', 'Full Body Flow'];
+    var pIds = ['partner-core-monday', 'partner-glutes-tuesday', 'partner-mobility-wednesday', 'partner-lower-thursday', 'partner-fullbody-friday', 'partner-stretch-saturday'];
+    var pTitles = ["Eva's Pilates Core", "Eva's Pilates Glutes + Posture", "Eva's Pilates Mobility Flow", "Eva's Pilates Lower Body", "Eva's Pilates Full Body Flow", "Eva's Pilates Stretch & Recovery"];
     var pWorkouts = [];
     for (var w = 1; w <= 6; w++) {
       var pd = daysAgo(w);
       var pi = (pd.getDay() + 6) % 7;
-      if (pi < 5) pWorkouts.push({ date: key(pd), dayId: pIds[pi], title: pTitles[pi] });
+      if (pi < 6) pWorkouts.push({ date: key(pd), dayId: pIds[pi], title: pTitles[pi] });
     }
     localStorage.setItem('fos:partner:workouts', JSON.stringify(pWorkouts));
 
@@ -65,7 +65,7 @@ const SEED = `
       waterMl: 1600, sleepHours: 7.67, steps: 5200, caloriesIn: 0, proteinIn: 0, mealsDone: {}
     }));
 
-    localStorage.setItem('fos:seeded:v3', '1');
+    localStorage.setItem('fos:seeded:v4', '1');
   } catch (e) {}
 })();
 `;

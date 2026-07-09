@@ -2,7 +2,7 @@
  * Fitness OS — static program & nutrition data (per profile).
  *
  * EDIT ME: everything a person trains and eats lives here.
- *  - Workouts: ME_PROGRAM (calisthenics) and PARTNER_PROGRAM (pilates).
+ *  - Workouts: ME_PROGRAM (calisthenics) and PARTNER_PROGRAM (Eva's Pilates routines).
  *  - Nutrition: ME_NUTRITION (2-meal cut) and PARTNER_NUTRITION (healthy routine).
  *
  * VIDEOS: exercises are matched to real YouTube tutorials by name via the
@@ -56,6 +56,8 @@ export type Exercise = {
   video: ExerciseVideo;
   /** "sets" = per-set checkboxes (strength); "flow" = single done toggle (pilates). */
   track?: "sets" | "flow";
+  /** Creator/source badge, e.g. "Eva's Pilates" (Partner routines). */
+  source?: string;
   note?: string;
 };
 
@@ -124,11 +126,10 @@ const exerciseVideos: Record<string, { videoUrl: string; videoId: string }> = {
   "Burpees": { videoUrl: "https://www.youtube.com/watch?v=qLBImHhCXSw", videoId: "qLBImHhCXSw" },
   "Mountain Climbers": { videoUrl: "https://www.youtube.com/watch?v=cnyTQDSE884", videoId: "cnyTQDSE884" },
 
-  // PARTNER — PILATES
-  // Left intentionally empty: every Pilates move resolves to an "Eva Pilates
-  // <move>" YouTube search (see partnerFallbackQuery) so her videos always show.
-  // To pin a specific Eva clip inline, add e.g.
-  //   "The Hundred": { videoUrl: "https://www.youtube.com/watch?v=XXXXXXXXXXX", videoId: "XXXXXXXXXXX" },
+  // PARTNER — EVA'S PILATES
+  // Partner routines don't use this name→clip map. Each day pins a specific
+  // Eva's Pilates video by id in PARTNER_ROUTINES below (one full guided routine
+  // per day). Change a `videoId` there to swap a clip.
 };
 
 /** Inline-playable clip from a YouTube id (+ optional canonical watch URL). */
@@ -183,8 +184,6 @@ type WorkoutDayInput = Omit<WorkoutDay, "exercises"> & { exercises: ExerciseInpu
 
 /** Search query for a Me/calisthenics move that has no specific clip on file. */
 const meFallbackQuery = (name: string) => `${name} calisthenics tutorial`;
-/** Search query for a Partner move — always surfaces Eva's Pilates videos. */
-const partnerFallbackQuery = (name: string) => `Eva Pilates ${name}`;
 
 /** Attach a resolved `video` to every exercise, matched by name. */
 function withVideos(
@@ -540,100 +539,168 @@ export const ME_REST_DAYS: RestDay[] = [
   },
 ];
 
-/* ============================== PARTNER — PILATES ========================== */
+/* ===================== PARTNER — EVA'S PILATES ROUTINES ==================== */
 
-const flow = (e: Omit<ExerciseInput, "track">): ExerciseInput => ({
-  ...e,
-  track: "flow",
-});
+/**
+ * Partner (Eva) trains along to real **Eva's Pilates** YouTube routines — one
+ * full guided video per day, not a list of small moves. Each day pins a
+ * specific clip from the @evaspilates channel that plays inline in the shared
+ * video modal (the exact same one the Me/Calisthenics videos use); a standing
+ * "Open on YouTube" fallback covers any video the creator has embed-disabled.
+ *
+ * IMPORTANT — healthy language: several source titles use weight-loss / body
+ * wording ("tiny waist", "slim", "lose belly fat", "de-bloat"). Those NEVER
+ * surface in the app. We show only the rewritten `title`/`focus` below
+ * (Core Strength, Glutes + Posture, Mobility, Lower Body, Full Body Flow,
+ * Stretch & Recovery). To swap a clip, change `videoId` only.
+ */
+export type PilatesRoutine = {
+  id: string;
+  profile: "partner";
+  /** Creator badge shown on every card & the detail screen. */
+  source: string;
+  /** App-facing title (healthy language, never the raw YouTube title). */
+  title: string;
+  weekday: string;
+  /** Short focus line, e.g. "Core • Posture • Control". */
+  subtitle: string;
+  /** Human duration label, e.g. "~15 min". */
+  duration: string;
+  /** Rough minutes for the shared numeric UI (hero ring meta, list). */
+  durationMin: number;
+  /** Colored focus pills. */
+  focus: string[];
+  /** Pinned Eva's Pilates YouTube video id. */
+  videoId: string;
+  /** Gentle cues shown in the video modal. */
+  notes: string[];
+};
 
-const PARTNER_PROGRAM_RAW: WorkoutDayInput[] = [
+/** Universal, body-neutral session cues shown on every Partner detail screen. */
+export const PARTNER_SESSION_CUES = [
+  "Move slowly",
+  "Control breathing",
+  "Keep posture clean",
+  "Stop if something feels painful",
+];
+
+export const PARTNER_ROUTINES: PilatesRoutine[] = [
   {
-    id: "p-core",
+    id: "partner-core-monday",
+    profile: "partner",
+    source: "Eva's Pilates",
+    title: "Eva's Pilates Core",
     weekday: "Monday",
-    title: "Pilates Core",
-    subtitle: "Deep core & breath",
-    focus: ["Core", "Breath", "Stability"],
-    duration: 30,
-    exercises: [
-      flow({ id: "pc-hundred", name: "The Hundred", sets: 3, reps: "40 sec", targetMuscle: "Deep core", tags: ["Core"], cues: ["Imprint spine", "Controlled breathing"] }),
-      flow({ id: "pc-rollup", name: "Roll-Up", sets: 3, reps: "10", targetMuscle: "Abdominals", tags: ["Core"], cues: ["Articulate spine", "Slow descent"] }),
-      flow({ id: "pc-deadbug", name: "Dead Bug", sets: 3, reps: "12", targetMuscle: "Core control", tags: ["Core"], cues: ["Ribs down", "Move opposite limbs"] }),
-      flow({ id: "pc-plank", name: "Forearm Plank", sets: 3, reps: "40 sec", targetMuscle: "Core, shoulders", tags: ["Core"], cues: ["Long spine", "Squeeze glutes"] }),
-      flow({ id: "pc-toetaps", name: "Toe Taps", sets: 3, reps: "12", targetMuscle: "Lower abs", tags: ["Core"], cues: ["Stable pelvis", "Tap lightly"] }),
-    ],
+    subtitle: "Core • Posture • Control",
+    duration: "~20 min",
+    durationMin: 20,
+    focus: ["Core", "Posture", "Control"],
+    videoId: "w7JksabVmcw",
+    notes: ["Controlled breathing", "Slow, controlled movement", "Keep your posture tall"],
   },
   {
-    id: "p-flow",
+    id: "partner-glutes-tuesday",
+    profile: "partner",
+    source: "Eva's Pilates",
+    title: "Eva's Pilates Glutes + Posture",
     weekday: "Tuesday",
-    title: "Pilates Flow",
-    subtitle: "Core, glutes, posture & mobility",
-    focus: ["Core", "Glutes", "Mobility", "Posture"],
-    duration: 35,
-    exercises: [
-      flow({ id: "pf-hundred", name: "The Hundred", sets: 3, reps: "40 sec", targetMuscle: "Deep core", tags: ["Core"], cues: ["Imprint spine", "Controlled breathing"] }),
-      flow({ id: "pf-rollup", name: "Roll-Up", sets: 3, reps: "10", targetMuscle: "Abdominals", tags: ["Core"], cues: ["Articulate spine", "Slow descent"] }),
-      flow({ id: "pf-glutebridge", name: "Glute Bridge", sets: 3, reps: "15", targetMuscle: "Glutes, hamstrings", tags: ["Glutes"], cues: ["Squeeze glutes", "Keep ribs down"] }),
-      flow({ id: "pf-sidelying", name: "Side-Lying Leg Series", sets: 3, reps: "12 each side", targetMuscle: "Hips, glute med", tags: ["Hips"], cues: ["Long legs", "Stable pelvis"] }),
-      flow({ id: "pf-catcow", name: "Cat-Cow + Thread the Needle", sets: 2, reps: "rounds", scheme: "2 rounds", targetMuscle: "Spine, upper back", tags: ["Mobility"], cues: ["Move slowly", "Open upper back"] }),
-    ],
+    subtitle: "Glutes • Hips • Posture",
+    duration: "~10 min",
+    durationMin: 10,
+    focus: ["Glutes", "Hips", "Posture"],
+    videoId: "iSR73LhKcB0",
+    notes: ["Squeeze through the glutes", "Keep hips level", "Move with control"],
   },
   {
-    id: "p-mobility",
+    id: "partner-mobility-wednesday",
+    profile: "partner",
+    source: "Eva's Pilates",
+    title: "Eva's Pilates Mobility Flow",
     weekday: "Wednesday",
-    title: "Mobility Flow",
-    subtitle: "Open & lengthen",
-    focus: ["Mobility", "Posture", "Spine"],
-    duration: 30,
-    exercises: [
-      flow({ id: "pm-catcow", name: "Cat-Cow", sets: 2, reps: "10", targetMuscle: "Spine", tags: ["Mobility"], cues: ["Segment the spine", "Match your breath"] }),
-      flow({ id: "pm-thread", name: "Thread the Needle", sets: 2, reps: "8 each side", targetMuscle: "Upper back", tags: ["Mobility"], cues: ["Reach long", "Rotate from ribs"] }),
-      flow({ id: "pm-spinetwist", name: "Seated Spine Twist", sets: 2, reps: "10", targetMuscle: "Obliques, spine", tags: ["Posture"], cues: ["Grow tall first", "Turn on exhale"] }),
-      flow({ id: "pm-hipopener", name: "Hip Openers", sets: 2, reps: "8 each side", targetMuscle: "Hips", tags: ["Hips"], cues: ["Move slow", "Breathe into the stretch"] }),
-      flow({ id: "pm-child", name: "Child's Pose Reach", sets: 1, reps: "60 sec", targetMuscle: "Back, hips", tags: ["Mobility"], cues: ["Sink the hips", "Walk hands wide"] }),
-    ],
+    subtitle: "Mobility • Posture • Breath",
+    duration: "~10 min",
+    durationMin: 10,
+    focus: ["Mobility", "Posture", "Breath"],
+    videoId: "5owlP1A_Hc4",
+    notes: ["Breathe into each movement", "Move slowly", "Lengthen through the spine"],
   },
   {
-    id: "p-lower",
+    id: "partner-lower-thursday",
+    profile: "partner",
+    source: "Eva's Pilates",
+    title: "Eva's Pilates Lower Body",
     weekday: "Thursday",
-    title: "Lower Body Pilates",
-    subtitle: "Glutes, legs & control",
-    focus: ["Glutes", "Legs", "Balance"],
-    duration: 35,
-    exercises: [
-      flow({ id: "pl-glutebridge", name: "Glute Bridge", sets: 3, reps: "15", targetMuscle: "Glutes", tags: ["Glutes"], cues: ["Squeeze glutes", "Keep ribs down"] }),
-      flow({ id: "pl-clamshell", name: "Clamshells", sets: 3, reps: "15 each side", targetMuscle: "Glute med", tags: ["Glutes"], cues: ["Stack the hips", "Open from the knee"] }),
-      flow({ id: "pl-sidelying", name: "Side-Lying Leg Series", sets: 3, reps: "12 each side", targetMuscle: "Hips, glutes", tags: ["Hips"], cues: ["Long legs", "Stable pelvis"] }),
-      flow({ id: "pl-circles", name: "Single-Leg Circles", sets: 2, reps: "8 each side", targetMuscle: "Hip control", tags: ["Legs"], cues: ["Small circles", "Pelvis still"] }),
-      flow({ id: "pl-balance", name: "Standing Balance", sets: 2, reps: "30 sec each", targetMuscle: "Balance, ankles", tags: ["Balance"], cues: ["Soft knee", "Gaze fixed"] }),
-    ],
+    subtitle: "Legs • Glutes • Balance",
+    duration: "~10 min",
+    durationMin: 10,
+    focus: ["Legs", "Glutes", "Balance"],
+    videoId: "MImzuAfIf-o",
+    notes: ["Steady, controlled reps", "Keep knees tracking", "Balance and breathe"],
   },
   {
-    id: "p-full",
+    id: "partner-fullbody-friday",
+    profile: "partner",
+    source: "Eva's Pilates",
+    title: "Eva's Pilates Full Body Flow",
     weekday: "Friday",
-    title: "Full Body Flow",
-    subtitle: "Total-body pilates flow",
-    focus: ["Full body", "Core", "Mobility"],
-    duration: 40,
-    exercises: [
-      flow({ id: "pfb-hundred", name: "The Hundred", sets: 3, reps: "40 sec", targetMuscle: "Deep core", tags: ["Core"], cues: ["Imprint spine", "Steady breath"] }),
-      flow({ id: "pfb-rollup", name: "Roll-Up", sets: 3, reps: "10", targetMuscle: "Abdominals", tags: ["Core"], cues: ["Articulate spine", "Slow descent"] }),
-      flow({ id: "pfb-glutebridge", name: "Glute Bridge", sets: 3, reps: "15", targetMuscle: "Glutes", tags: ["Glutes"], cues: ["Squeeze glutes", "Ribs down"] }),
-      flow({ id: "pfb-plankpike", name: "Plank to Pike", sets: 3, reps: "10", targetMuscle: "Core, shoulders", tags: ["Core"], cues: ["Lift from the core", "Long arms"] }),
-      flow({ id: "pfb-catcow", name: "Cat-Cow", sets: 2, reps: "10", targetMuscle: "Spine", tags: ["Mobility"], cues: ["Move slowly", "Open the back"] }),
-    ],
+    subtitle: "Full Body • Energy • Control",
+    duration: "~15 min",
+    durationMin: 15,
+    focus: ["Full Body", "Energy", "Control"],
+    videoId: "Nr41z1LK6GU",
+    notes: ["Flow at your own pace", "Keep the core engaged", "Breathe steadily"],
+  },
+  {
+    id: "partner-stretch-saturday",
+    profile: "partner",
+    source: "Eva's Pilates",
+    title: "Eva's Pilates Stretch & Recovery",
+    weekday: "Saturday",
+    subtitle: "Stretch • Mobility • Recovery",
+    duration: "~10 min",
+    durationMin: 10,
+    focus: ["Stretch", "Mobility", "Recovery"],
+    videoId: "rpPuaKYlyBs",
+    notes: ["Relax into the movement", "Long, slow breaths", "Never force a stretch"],
   },
 ];
 
-export const PARTNER_PROGRAM: WorkoutDay[] = withVideos(PARTNER_PROGRAM_RAW, partnerFallbackQuery);
+/** A Partner routine → a WorkoutDay with a single "flow" video, so the shared
+ *  home hero, session tracking and workout history keep working unchanged. */
+function routineToDay(r: PilatesRoutine): WorkoutDay {
+  return {
+    id: r.id,
+    weekday: r.weekday,
+    title: r.title,
+    subtitle: r.subtitle,
+    focus: r.focus,
+    duration: r.durationMin,
+    exercises: [
+      {
+        id: `${r.id}-routine`,
+        name: r.title,
+        sets: 1,
+        reps: r.duration,
+        scheme: r.duration,
+        targetMuscle: r.focus.join(", "),
+        tags: r.focus,
+        cues: r.notes,
+        video: makeEmbedVideo(r.videoId),
+        track: "flow",
+        source: r.source,
+      },
+    ],
+  };
+}
+
+export const PARTNER_PROGRAM: WorkoutDay[] = PARTNER_ROUTINES.map(routineToDay);
+
+/** Look up the rich routine (source, notes, video id) behind a Partner day. */
+export function getPartnerRoutine(dayId: string): PilatesRoutine | undefined {
+  return PARTNER_ROUTINES.find((r) => r.id === dayId);
+}
 
 export const PARTNER_REST_DAYS: RestDay[] = [
-  {
-    weekday: "Saturday",
-    title: "Stretch & Recovery",
-    subtitle: "Gentle mobility & breath",
-    suggestions: ["15 min full-body stretch", "Slow walk outdoors", "5 min breathing"],
-  },
   {
     weekday: "Sunday",
     title: "Rest",

@@ -96,7 +96,9 @@ export default function TodayPage() {
             completed={completedToday}
             resumed={doneSets > 0}
             heroImage={meta.heroImage}
+            heroImageDark={meta.heroImageDark}
             tint={profile === "partner" ? "partner" : "me"}
+            source={profile === "partner" ? "Eva's Pilates" : undefined}
           />
         ) : (
           restDay && (

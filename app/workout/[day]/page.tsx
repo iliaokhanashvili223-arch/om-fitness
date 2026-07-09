@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Activity, ArrowRight, CheckCircle2, Clock, RotateCcw, Zap } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { ExerciseCard } from "@/components/exercise-card";
+import { PartnerRoutineDetail } from "@/components/partner-routine-detail";
 import { VideoModal } from "@/components/video-modal";
 import { RestTimerBar } from "@/components/rest-timer-bar";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,17 @@ export default function WorkoutDetailPage() {
   }, [ready, day, router]);
 
   if (!day) return null;
+
+  // Partner (Eva) days are a single guided Eva's Pilates routine video, shown
+  // with a dedicated premium layout instead of the strength exercise list.
+  if (profile === "partner") {
+    return (
+      <div className="mx-auto min-h-[100dvh] w-full max-w-md px-5 pb-[calc(env(safe-area-inset-bottom)+7rem)] pt-[max(env(safe-area-inset-top),1.25rem)]">
+        <AppHeader back />
+        <PartnerRoutineDetail day={day} />
+      </div>
+    );
+  }
 
   const isFlow = day.exercises.every((e) => e.track === "flow");
   const done = isDoneToday(day.id);

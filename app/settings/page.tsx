@@ -14,6 +14,7 @@ import {
   Sun,
   Target,
   User,
+  Youtube,
 } from "lucide-react";
 import { PageContainer } from "@/components/page-container";
 import { AppHeader } from "@/components/app-header";
@@ -121,6 +122,19 @@ export default function SettingsPage() {
           Switch up top
         </span>
       </Card>
+
+      {/* Partner (Eva's Pilates) program note */}
+      {profile === "partner" && (
+        <div className="flex items-start gap-3 rounded-2xl border border-border bg-purple-soft/50 p-4">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-card text-purple shadow-card">
+            <Youtube className="h-[18px] w-[18px] text-[#FF0000]" />
+          </span>
+          <p className="text-[13px] leading-snug text-muted-foreground">
+            Partner program uses <span className="font-semibold text-foreground">Eva&apos;s Pilates</span>{" "}
+            YouTube routines. Some videos may open on YouTube if embedding is disabled by the creator.
+          </p>
+        </div>
+      )}
 
       {/* Appearance */}
       <Card className="p-5">

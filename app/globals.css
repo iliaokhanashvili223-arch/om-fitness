@@ -119,20 +119,14 @@
        pale background without losing the airy feel. */
     filter: contrast(1.14) saturate(1.28);
   }
-  .dark .hero-photo {
-    /* Dark mode: the figure is decorative only — a faint, clean ghost on the
-       right that never fogs the card. Masked so it stays well clear of the
-       title/metadata and melts into the top, bottom and left edges. */
-    opacity: 0.15;
-    filter: brightness(1.18) contrast(1.02) saturate(0.85);
-    -webkit-mask-image:
-      linear-gradient(to right, transparent 32%, #000 82%),
-      linear-gradient(to bottom, transparent 2%, #000 20%, #000 84%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image:
-      linear-gradient(to right, transparent 32%, #000 82%),
-      linear-gradient(to bottom, transparent 2%, #000 20%, #000 84%, transparent 100%);
-    mask-composite: intersect;
+  /* Dark mode uses a dedicated cinematic dark image instead (the light photo is
+     hidden via `dark:hidden`). It covers the card, anchored to the right, held
+     at a low opacity so it reads as a premium background layer, not content. */
+  .hero-photo-dark {
+    object-fit: cover;
+    object-position: center right;
+    /* Lift the very dark source a touch so the figure reads on the navy card. */
+    filter: brightness(1.12) saturate(1.06);
   }
   /* Left→right (plus a touch of bottom) scrim in the card color, so the ring,
      title, focus tags and CTA stay legible while the figure breathes on the
@@ -149,19 +143,27 @@
       linear-gradient(to top, rgb(var(--card) / 0.42), rgb(var(--card) / 0) 32%);
   }
   .dark .hero-scrim {
-    /* No white/blue haze. Keep the content (left) side deep and clean, then add
-       a subtle cool glow toward the right and a soft blue lift under the CTA for
-       a premium, intentional finish. */
+    /* Dark, readable left → clear right so the illustration shows, plus a soft
+       blue glow near the CTA. No white/blue haze. */
     background:
-      radial-gradient(120% 95% at 90% 38%, rgba(56, 110, 255, 0.16), rgba(56, 110, 255, 0) 58%),
-      radial-gradient(85% 78% at 72% 118%, rgba(46, 99, 255, 0.2), rgba(46, 99, 255, 0) 62%),
-      linear-gradient(100deg, rgba(8, 12, 26, 0.7) 0%, rgba(8, 12, 26, 0.22) 36%, rgba(8, 12, 26, 0) 58%);
+      radial-gradient(circle at 75% 88%, rgba(0, 67, 216, 0.28), transparent 46%),
+      linear-gradient(
+        90deg,
+        rgba(7, 11, 22, 0.97) 0%,
+        rgba(7, 11, 22, 0.9) 30%,
+        rgba(7, 11, 22, 0.52) 56%,
+        rgba(7, 11, 22, 0.1) 80%,
+        rgba(7, 11, 22, 0) 100%
+      );
   }
-  /* Dark mode hero gets its own deep navy → charcoal base (light mode keeps the
-     soft tinted gradient set on the element). */
+  /* Dark mode hero gets its own deep navy base + depth shadow (light mode keeps
+     the soft tinted gradient set on the element). */
   .dark .hero-card {
-    background-image: linear-gradient(135deg, #0b1020 0%, #111827 45%, #1a2238 100%);
+    background-image: linear-gradient(135deg, #070b16 0%, #101827 45%, #17213a 100%);
     border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
   /* Progress-ring track: soft grey in light mode, a faint white in dark so the
      ring reads cleanly on the navy base (active ring stays bright blue). */
@@ -169,13 +171,27 @@
     stroke: rgb(var(--muted));
   }
   .dark .hero-ring-track {
-    stroke: rgba(255, 255, 255, 0.09);
+    stroke: rgba(255, 255, 255, 0.08);
   }
   /* Focus chips: dark mode swaps the light card fill for a glassy white tint
      with a hairline border and a bright-blue label. */
   .dark .hero-chip {
     background-color: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.12);
     color: rgb(158, 188, 255);
+  }
+  /* Progress-ring disc: translucent deep navy in dark so it sits on the card
+     instead of a hard charcoal puck (inset ring adds a hairline edge). */
+  .dark .hero-ring-disc {
+    background-color: rgba(7, 11, 22, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+  /* Metadata reads a touch brighter over the dark image. */
+  .dark .hero-meta {
+    color: rgb(203, 213, 225);
+  }
+  /* CTA keeps its bright blue with a deeper premium glow in dark. */
+  .dark .hero-cta {
+    box-shadow: 0 16px 40px rgba(47, 99, 255, 0.3);
   }
 }

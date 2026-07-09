@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -10,13 +11,14 @@ import {
   Footprints,
   HeartPulse,
   Moon,
-  Wind,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PageContainer } from "@/components/page-container";
 import { AppHeader } from "@/components/app-header";
+import { PartnerRoutineCard } from "@/components/partner-routine-card";
+import { VideoModal } from "@/components/video-modal";
 import { Card } from "@/components/ui/card";
-import { getProgram, getRestDays } from "@/lib/data";
+import { getProgram, getRestDays, type Exercise } from "@/lib/data";
 import { useProfile } from "@/components/profile-provider";
 import { PROFILES } from "@/lib/profiles";
 import { useWorkoutHistory } from "@/lib/storage";
@@ -31,17 +33,14 @@ const BUBBLE: Record<Tone, string> = {
   orange: "bg-orange-soft text-orange",
 };
 
+// Me/calisthenics day visuals. Partner days render as Eva's Pilates routine
+// cards (see PartnerRoutineCard), so they don't need an entry here.
 const DAY_VISUAL: Record<string, { icon: LucideIcon; tone: Tone }> = {
   pull: { icon: Dumbbell, tone: "primary" },
   push: { icon: Activity, tone: "primary" },
   "legs-core": { icon: Footprints, tone: "success" },
   "upper-volume": { icon: Dumbbell, tone: "purple" },
   conditioning: { icon: HeartPulse, tone: "orange" },
-  "p-core": { icon: Activity, tone: "primary" },
-  "p-flow": { icon: Wind, tone: "primary" },
-  "p-mobility": { icon: Wind, tone: "purple" },
-  "p-lower": { icon: Footprints, tone: "success" },
-  "p-full": { icon: HeartPulse, tone: "orange" },
 };
 
 const REST_VISUAL: Record<string, { icon: LucideIcon; tone: Tone }> = {
@@ -56,6 +55,8 @@ export default function WorkoutListPage() {
   const restDays = getRestDays(profile);
   const todayIndex = programDayIndex();
   const { isDoneToday } = useWorkoutHistory();
+  const isPartner = profile === "partner";
+  const [videoExercise, setVideoExercise] = React.useState<Exercise | null>(null);
 
   return (
     <PageContainer>
@@ -70,6 +71,25 @@ export default function WorkoutListPage() {
         {program.map((day, i) => {
           const isToday = i === todayIndex;
           const done = isToday && isDoneToday(day.id);
+
+          if (isPartner) {
+            return (
+              <motion.div
+                key={day.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <PartnerRoutineCard
+                  day={day}
+                  isToday={isToday}
+                  done={done}
+                  onOpenVideo={() => setVideoExercise(day.exercises[0])}
+                />
+              </motion.div>
+            );
+          }
+
           const v = DAY_VISUAL[day.id] ?? { icon: Dumbbell, tone: "primary" as Tone };
           const Icon = v.icon;
           return (
@@ -167,6 +187,8 @@ export default function WorkoutListPage() {
           })}
         </div>
       </div>
+
+      <VideoModal exercise={videoExercise} onClose={() => setVideoExercise(null)} />
     </PageContainer>
   );
 }

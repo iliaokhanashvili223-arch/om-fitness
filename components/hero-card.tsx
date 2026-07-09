@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Clock, Activity } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock, Activity, Youtube } from "lucide-react";
 import { ProgressRing } from "@/components/progress-ring";
 import { Button } from "@/components/ui/button";
 import type { WorkoutDay } from "@/lib/data";
@@ -13,11 +13,15 @@ type HeroCardProps = {
   completed: boolean;
   resumed: boolean;
   heroImage: string;
+  /** Dedicated dark-mode image (cinematic dark asset). */
+  heroImageDark: string;
   tint: "me" | "partner";
+  /** Creator badge (Partner = "Eva's Pilates"); replaces the exercise count. */
+  source?: string;
 };
 
 /** Premium "today's workout" hero: progress ring, meta, focus tags, CTA + figure. */
-export function HeroCard({ day, progress, completed, resumed, heroImage, tint }: HeroCardProps) {
+export function HeroCard({ day, progress, completed, resumed, heroImage, heroImageDark, tint, source }: HeroCardProps) {
   const pct = completed ? 100 : Math.round(progress * 100);
 
   return (
@@ -29,21 +33,32 @@ export function HeroCard({ day, progress, completed, resumed, heroImage, tint }:
           : "bg-gradient-to-br from-primary-soft via-primary-soft/55 to-card"
       )}
     >
-      {/* Full-bleed figure photo. High-key in light mode, a soft luminous
-          figure in dark mode (see .hero-photo / .hero-scrim in globals.css). */}
+      {/* Light mode: the high-key figure photo (hidden in dark). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={heroImage}
         alt=""
         aria-hidden
-        className="hero-photo pointer-events-none absolute inset-0 h-full w-full select-none"
+        className="hero-photo pointer-events-none absolute inset-0 h-full w-full select-none dark:hidden"
       />
-      {/* Theme-aware scrim keeps the ring, title and tags legible over the photo. */}
+      {/* Dark mode: a dedicated cinematic dark asset, shown only in dark. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={heroImageDark}
+        alt=""
+        aria-hidden
+        className={cn(
+          "hero-photo-dark pointer-events-none absolute inset-0 hidden h-full w-full select-none dark:block",
+          tint === "partner" ? "opacity-[0.66]" : "opacity-[0.72]"
+        )}
+      />
+      {/* Theme-aware overlay: keeps the left (content) side dark and readable
+          while the illustration breathes on the right (see globals.css). */}
       <div className="hero-scrim pointer-events-none absolute inset-0" aria-hidden />
 
       <div className="relative p-5">
         <div className="flex items-center gap-4">
-          <div className="flex h-[116px] w-[116px] shrink-0 items-center justify-center rounded-full bg-card shadow-card">
+          <div className="hero-ring-disc flex h-[116px] w-[116px] shrink-0 items-center justify-center rounded-full bg-card shadow-card">
             <ProgressRing
               progress={completed ? 1 : progress}
               size={116}
@@ -66,14 +81,20 @@ export function HeroCard({ day, progress, completed, resumed, heroImage, tint }:
             <h2 className="mt-1 text-[30px] font-extrabold leading-[1.05] tracking-tight">
               {day.title}
             </h2>
-            <div className="mt-2 flex items-center gap-2 text-[13px] font-medium text-muted-foreground">
+            <div className="hero-meta mt-2 flex items-center gap-2 text-[13px] font-medium text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Clock className="h-4 w-4" /> ~{day.duration} min
               </span>
               <span className="text-subtle">·</span>
-              <span className="flex items-center gap-1">
-                <Activity className="h-4 w-4" /> {day.exercises.length} exercises
-              </span>
+              {source ? (
+                <span className="flex items-center gap-1">
+                  <Youtube className="h-4 w-4 text-[#FF0000]" /> {source}
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Activity className="h-4 w-4" /> {day.exercises.length} exercises
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -95,7 +116,7 @@ export function HeroCard({ day, progress, completed, resumed, heroImage, tint }:
         <Button
           asChild
           size="lg"
-          className="mt-4 h-[54px] w-full text-base"
+          className={cn("mt-4 h-[54px] w-full text-base", !completed && "hero-cta")}
           variant={completed ? "success" : "primary"}
         >
           <Link href={`/workout/${day.id}`}>

@@ -83,7 +83,7 @@ export function VideoModal({ exercise, onClose }: VideoModalProps) {
                 <iframe
                   key={exercise.video.videoId}
                   className="h-full w-full"
-                  src={`${exercise.video.embedUrl}?rel=0&modestbranding=1`}
+                  src={`${exercise.video.embedUrl}?playsinline=1&rel=0&modestbranding=1`}
                   title={exercise.name}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -102,8 +102,14 @@ export function VideoModal({ exercise, onClose }: VideoModalProps) {
             <div className="overflow-y-auto px-6 py-5">
               <h2 className="text-xl font-bold tracking-tight">{exercise.name}</h2>
               <div className="mt-2 flex flex-wrap items-center gap-2">
+                {exercise.source && (
+                  <span className="flex items-center gap-1.5 rounded-full bg-purple-soft px-3 py-1 text-xs font-semibold text-purple">
+                    <Youtube className="h-3.5 w-3.5 text-[#FF0000]" />
+                    {exercise.source}
+                  </span>
+                )}
                 <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
-                  {exercise.sets} sets × {exercise.reps}
+                  {exercise.scheme ?? `${exercise.sets} sets × ${exercise.reps}`}
                 </span>
                 {muscles.map((muscle) => (
                   <span

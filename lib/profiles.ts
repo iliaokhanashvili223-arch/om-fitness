@@ -35,6 +35,8 @@ export type ProfileMeta = {
   /** Show calorie + protein tracking (Me = yes, Partner = softer, off by default). */
   showMacros: boolean;
   heroImage: string;
+  /** Dedicated dark-mode hero image (cinematic dark asset; light mode keeps heroImage). */
+  heroImageDark: string;
   heroTitle: string;
   heroSubtitle: string;
   workoutSubtitle: string;
@@ -55,6 +57,7 @@ export const PROFILES: Record<ProfileId, ProfileMeta> = {
     trainingStyle: "Calisthenics",
     showMacros: true,
     heroImage: "/assets/background_me_today_hero.jpg",
+    heroImageDark: "/assets/futuristic_digital_human_silhouette.webp",
     heroTitle: "Today's workout",
     heroSubtitle: "Strength, muscle retention & fat loss",
     workoutSubtitle: "Your 5-day split",
@@ -79,6 +82,7 @@ export const PROFILES: Record<ProfileId, ProfileMeta> = {
     trainingStyle: "Eva's Pilates",
     showMacros: false,
     heroImage: "/assets/background_partner_pilates_hero.jpg",
+    heroImageDark: "/assets/serene_strength_in_motion.webp",
     heroTitle: "Today's workout",
     heroSubtitle: "Core, glutes, posture & mobility",
     workoutSubtitle: "Eva's Pilates flow",
