@@ -22,7 +22,7 @@ npm run build
 npm run start
 ```
 
-The app works fully offline after the first load and stores **all** data in your browser's LocalStorage (nothing is sent anywhere). Realistic demo data (weight trend, a 9-day streak, partial daily progress) is seeded automatically on first launch. Wipe everything from **Settings → Reset all data**.
+The app works fully offline after the first load and stores **all** data in your browser's LocalStorage (nothing is sent anywhere). It starts as a clean slate — each profile enters their own name, body stats and daily data. Wipe everything anytime from **Settings → Reset all data**.
 
 ---
 
@@ -79,7 +79,7 @@ components/
   weight-chart.tsx        Minimal animated SVG line chart
   theme-provider.tsx      next-themes wrapper (light/dark)
   pwa-register.tsx        Registers the service worker (production only)
-  seed-script.tsx         Seeds realistic demo data on first load
+  reset-script.tsx        One-time clean-slate wipe on first load
   ui/                     shadcn-style primitives: button, card, input, switch, progress-bar
 
 lib/

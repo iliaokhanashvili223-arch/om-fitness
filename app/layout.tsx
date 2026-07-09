@@ -6,7 +6,7 @@ import { ProfileProvider } from "@/components/profile-provider";
 import { RestTimerProvider } from "@/components/rest-timer";
 import { BottomNav } from "@/components/bottom-nav";
 import { PwaRegister } from "@/components/pwa-register";
-import { SeedScript } from "@/components/seed-script";
+import { ResetScript } from "@/components/reset-script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -50,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
       <body className="min-h-[100dvh] bg-background font-sans text-foreground antialiased">
-        <SeedScript />
+        <ResetScript />
         {/* Soft blue-tinted backdrop for the premium fitness-OS feel. */}
         <div className="app-backdrop pointer-events-none fixed inset-0 -z-10" aria-hidden />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>

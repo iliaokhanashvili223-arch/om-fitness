@@ -233,7 +233,7 @@ export default function TodayPage() {
           icon={Scale}
           tone="primary"
           label="Current weight"
-          value={<>{latestWeight ? `${latestWeight.kg} kg` : `${settings.weightKg} kg`}</>}
+          value={<>{latestWeight ? `${latestWeight.kg} kg` : settings.weightKg ? `${settings.weightKg} kg` : "—"}</>}
           badge={
             weightDelta !== null
               ? {

@@ -67,9 +67,10 @@ export const PROFILES: Record<ProfileId, ProfileMeta> = {
     goalLine: "Cutting • Strength • Muscle retention",
     restPresets: [60, 90, 120],
     settings: {
-      name: "Alex",
-      heightCm: 175,
-      weightKg: 78,
+      // Clean slate — the user sets their own name + body stats on first login.
+      name: "Athlete",
+      heightCm: 0,
+      weightKg: 0,
       goal: "Cutting",
       targets: { calories: 2100, protein: 150, waterMl: 2700, steps: 10000, sleepHours: 8 },
     },
@@ -92,9 +93,10 @@ export const PROFILES: Record<ProfileId, ProfileMeta> = {
     goalLine: "Tone • Mobility • Posture • Core strength",
     restPresets: [30, 45, 60],
     settings: {
-      name: "Eva",
-      heightCm: 165,
-      weightKg: 50,
+      // Clean slate — Eva enters her own name + body stats on first login.
+      name: "Athlete",
+      heightCm: 0,
+      weightKg: 0,
       goal: "Tone & mobility",
       // Partner is not on a calorie deficit — macros are hidden, water/steps/sleep only.
       targets: { calories: 1800, protein: 90, waterMl: 2400, steps: 8000, sleepHours: 8 },
