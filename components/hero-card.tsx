@@ -29,17 +29,17 @@ export function HeroCard({ day, progress, completed, resumed, heroImage, tint }:
           : "bg-gradient-to-br from-primary-soft via-primary-soft/55 to-card"
       )}
     >
-      {/* Figure sits softly on the right — kept low-opacity so the card stays airy. */}
+      {/* Full-bleed figure photo. High-key in light mode, a soft luminous
+          figure in dark mode (see .hero-photo / .hero-scrim in globals.css). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={heroImage}
         alt=""
         aria-hidden
-        className={cn(
-          "hero-figure-mask pointer-events-none absolute right-0 top-0 h-full w-[42%] select-none object-cover object-top",
-          tint === "partner" ? "opacity-50" : "opacity-[0.72]"
-        )}
+        className="hero-photo pointer-events-none absolute inset-0 h-full w-full select-none"
       />
+      {/* Theme-aware scrim keeps the ring, title and tags legible over the photo. */}
+      <div className="hero-scrim pointer-events-none absolute inset-0" aria-hidden />
 
       <div className="relative p-5">
         <div className="flex items-center gap-4">

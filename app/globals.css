@@ -107,13 +107,45 @@
       radial-gradient(120% 60% at 12% 0%, rgba(0, 67, 216, 0.05), transparent 60%),
       radial-gradient(120% 55% at 100% 6%, rgba(124, 58, 237, 0.04), transparent 55%);
   }
-  /* Fade the left + bottom edges of the cropped hero figures so they blend. */
-  .hero-figure-mask {
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 45%),
-      linear-gradient(to bottom, #000 80%, transparent);
-    -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(to right, transparent, #000 45%),
-      linear-gradient(to bottom, #000 80%, transparent);
-    mask-composite: intersect;
+  /* ── Today hero photo ──────────────────────────────────────────────
+     Full-bleed figure photo behind the hero card. The source images are
+     high-key (near-white on a soft tint), so in light mode they sit vivid
+     and untouched, while in dark mode they're dimmed to a soft luminous
+     figure so the card never becomes a bright block. */
+  .hero-photo {
+    object-fit: cover;
+    object-position: 64% 30%;
+    /* Deepen the high-key photo so the figure gains definition against the
+       pale background without losing the airy feel. */
+    filter: contrast(1.14) saturate(1.28);
+  }
+  .dark .hero-photo {
+    opacity: 0.44;
+    filter: saturate(0.82) brightness(1.04);
+  }
+  /* Left→right (plus a touch of bottom) scrim in the card color, so the ring,
+     title, focus tags and CTA stay legible while the figure breathes on the
+     right. Tuned separately per theme. */
+  .hero-scrim {
+    background:
+      linear-gradient(
+        105deg,
+        rgb(var(--card)) 2%,
+        rgb(var(--card) / 0.6) 24%,
+        rgb(var(--card) / 0.12) 50%,
+        rgb(var(--card) / 0) 66%
+      ),
+      linear-gradient(to top, rgb(var(--card) / 0.42), rgb(var(--card) / 0) 32%);
+  }
+  .dark .hero-scrim {
+    background:
+      linear-gradient(
+        105deg,
+        rgb(var(--card)) 14%,
+        rgb(var(--card) / 0.88) 38%,
+        rgb(var(--card) / 0.28) 64%,
+        rgb(var(--card) / 0) 86%
+      ),
+      linear-gradient(to top, rgb(var(--card) / 0.62), rgb(var(--card) / 0) 36%);
   }
 }
