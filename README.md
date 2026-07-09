@@ -58,21 +58,19 @@ Then on your phone:
 
 ```
 app/
-  layout.tsx              Root layout, fonts, PWA metadata, providers, seed script
+  layout.tsx              Root layout, fonts, PWA metadata, providers, reset script
   globals.css             Design tokens (RGB channel vars), light/dark themes, utilities
   page.tsx                TODAY screen
   workout/page.tsx        WORKOUT — the 5-day split list
   workout/[day]/page.tsx  Workout detail (sets, cues, timer, video)
-  nutrition/page.tsx      NUTRITION — 2-meal cutting plan + trackers
-  progress/page.tsx       PROGRESS — weight chart, streak, stats
-  settings/page.tsx       SETTINGS — theme, body stats, targets, reset
+  progress/page.tsx       PROGRESS — streak, sessions, weight chart
+  settings/page.tsx       SETTINGS — theme, body stats, reset
 
 components/
-  bottom-nav.tsx          Floating 5-tab bottom navigation (animated active pill)
+  bottom-nav.tsx          Floating 4-tab bottom navigation (animated active pill)
   page-container.tsx      Mobile-first centered column w/ safe-area padding
   page-header.tsx         Reusable screen header
   progress-ring.tsx       Animated Apple-Fitness-style SVG ring
-  tracker-card.tsx        Reusable +/- tracker card (water, steps, sleep)
   exercise-card.tsx       Exercise card: thumbnail, cues, set checkboxes, rest hint
   video-modal.tsx         Fullscreen YouTube tutorial sheet
   rest-timer.tsx          App-wide fullscreen rest timer (60/90/120s) + provider
@@ -83,8 +81,8 @@ components/
   ui/                     shadcn-style primitives: button, card, input, switch, progress-bar
 
 lib/
-  data.ts                 The 5-day program + weekend + nutrition plan (edit videos here)
-  storage.ts              Typed LocalStorage hooks (settings, daily log, weights, sessions)
+  data.ts                 Calisthenics + Eva's Pilates programs (edit videos here)
+  storage.ts              Typed LocalStorage hooks (settings, weights, workout history, sessions)
   utils.ts                cn(), date + math helpers
 
 public/
@@ -110,7 +108,6 @@ Any exercise **not** in the map falls back to a YouTube **search** instead of a 
 - **Notifications** — rest-timer completion + daily reminders via the Web Push API.
 - **Cloud sync / backup** — optional account (or export/import JSON) so data survives a cleared browser.
 - **Charts** — bodyweight moving average line, volume-per-week, and streak calendar with a real chart lib.
-- **Barcode / macro search** for faster nutrition logging beyond the two-meal template.
-- **Onboarding** — a first-run flow to set name, stats and targets instead of seeded demo data.
+- **Onboarding** — a first-run flow to set name and body stats.
 - **Haptics & sound polish** on iOS, and a proper install prompt (`beforeinstallprompt`) on Android.
 ```

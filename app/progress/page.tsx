@@ -2,7 +2,17 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Activity, Dumbbell, Flame, Moon, Plus, Scale, Trash2, TrendingDown, Wind } from "lucide-react";
+import {
+  Activity,
+  CalendarCheck,
+  CheckCircle2,
+  Dumbbell,
+  Flame,
+  Plus,
+  Scale,
+  Target,
+  Trash2,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PageContainer } from "@/components/page-container";
 import { AppHeader } from "@/components/app-header";
@@ -11,17 +21,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import {
-  computeStreak,
-  useDailyLog,
-  useSettings,
-  useWeights,
-  useWorkoutHistory,
-  weeklyAverage,
-  type WeightEntry,
-} from "@/lib/storage";
+import { computeStreak, useSettings, useWeights, useWorkoutHistory, type WeightEntry } from "@/lib/storage";
 import { useProfile } from "@/components/profile-provider";
 import { PROFILES } from "@/lib/profiles";
+import { getProgram } from "@/lib/data";
 import { cn, dateKey } from "@/lib/utils";
 
 type Tone = "primary" | "success" | "purple" | "danger";
@@ -57,54 +60,66 @@ function StatCard({ icon: Icon, tone, label, value, unit, pill }: Stat) {
   );
 }
 
+/** "Today" / "Yesterday" / "Mon, Jul 7". */
+function relativeDay(dateStr: string): string {
+  if (dateStr === dateKey()) return "Today";
+  if (dateStr === dateKey(new Date(Date.now() - 864e5))) return "Yesterday";
+  return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export default function ProgressPage() {
   const { profile } = useProfile();
   const meta = PROFILES[profile];
+  const isPartner = profile === "partner";
   const { value: settings } = useSettings();
   const { value: weights, addWeight, removeWeight } = useWeights();
   const { value: workouts } = useWorkoutHistory();
-  const { value: daily } = useDailyLog();
 
   const [input, setInput] = React.useState("");
   const [pendingDelete, setPendingDelete] = React.useState<WeightEntry | null>(null);
 
   const streak = computeStreak(workouts);
-  const avg = weeklyAverage(weights);
   const latest = weights.length ? weights[weights.length - 1] : null;
-  const first = weights.length ? weights[0] : null;
-  const totalChange = latest && first ? +(latest.kg - first.kg).toFixed(1) : null;
 
   const weekAgo = dateKey(new Date(Date.now() - 6 * 864e5));
   const sessionsThisWeek = workouts.filter((w) => w.date >= weekAgo).length;
-  const consistency = Math.round(Math.min(sessionsThisWeek / 5, 1) * 100);
+  const weeklyTarget = getProgram(profile).length;
+  const consistency = Math.round(Math.min(sessionsThisWeek / weeklyTarget, 1) * 100);
 
-  const stats: Stat[] = meta.showMacros
-    ? [
-        { icon: Flame, tone: "primary", label: "Day streak", value: `${streak}`, unit: "days" },
-        { icon: Dumbbell, tone: "purple", label: "Workouts done", value: `${workouts.length}`, unit: "workouts" },
-        { icon: Scale, tone: "success", label: "Weekly average", value: avg ? `${avg}` : "—", unit: "kg" },
-        {
-          icon: TrendingDown,
-          tone: totalChange !== null && totalChange <= 0 ? "success" : "primary",
-          label: "Total change",
-          value: totalChange !== null ? `${totalChange > 0 ? "+" : ""}${totalChange}` : "—",
-          unit: "kg",
-          pill: "vs last 7 days",
-        },
-      ]
-    : [
-        { icon: Flame, tone: "primary", label: "Pilates streak", value: `${streak}`, unit: "days" },
-        { icon: Activity, tone: "purple", label: "Sessions done", value: `${workouts.length}`, unit: "sessions" },
-        { icon: Wind, tone: "success", label: "Mobility", value: `${consistency}`, unit: "% this week" },
-        {
-          icon: Moon,
-          tone: "purple",
-          label: "Sleep",
-          value: `${daily.sleepHours.toFixed(1)}`,
-          unit: "hours",
-          pill: daily.sleepHours >= 7 ? "Good" : undefined,
-        },
-      ];
+  const stats: Stat[] = [
+    {
+      icon: Flame,
+      tone: "primary",
+      label: isPartner ? "Pilates streak" : "Day streak",
+      value: `${streak}`,
+      unit: "days",
+    },
+    {
+      icon: isPartner ? Activity : Dumbbell,
+      tone: "purple",
+      label: isPartner ? "Sessions done" : "Workouts done",
+      value: `${workouts.length}`,
+      unit: isPartner ? "sessions" : "workouts",
+    },
+    {
+      icon: CalendarCheck,
+      tone: "success",
+      label: "This week",
+      value: `${sessionsThisWeek}`,
+      unit: "sessions",
+    },
+    {
+      icon: Target,
+      tone: "primary",
+      label: "Consistency",
+      value: `${consistency}`,
+      unit: "% this week",
+    },
+  ];
 
   const submit = () => {
     const kg = parseFloat(input.replace(",", "."));
@@ -114,7 +129,8 @@ export default function ProgressPage() {
     }
   };
 
-  const recent = [...weights].reverse().slice(0, 6);
+  const recentSessions = [...workouts].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+  const recentWeights = [...weights].reverse().slice(0, 6);
   const recentTones: Tone[] = ["primary", "purple", "success"];
 
   return (
@@ -131,6 +147,43 @@ export default function ProgressPage() {
         {stats.map((s) => (
           <StatCard key={s.label} {...s} />
         ))}
+      </div>
+
+      {/* Recent sessions */}
+      <div>
+        <h2 className="mb-2 px-1 text-[17px] font-bold tracking-tight">
+          {isPartner ? "Recent Pilates sessions" : "Recent workouts"}
+        </h2>
+        {recentSessions.length === 0 ? (
+          <Card className="flex flex-col items-center gap-2 p-8 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+              <Dumbbell className="h-6 w-6" />
+            </span>
+            <p className="text-sm font-medium">No sessions yet</p>
+            <p className="text-xs text-muted-foreground">Complete a workout to see it here.</p>
+          </Card>
+        ) : (
+          <div className="flex flex-col gap-2.5">
+            {recentSessions.map((w, i) => (
+              <motion.div
+                key={`${w.date}-${w.dayId}`}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.04 }}
+              >
+                <Card className="flex items-center gap-3 p-3.5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-success-soft text-success">
+                    <CheckCircle2 className="h-[18px] w-[18px]" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-bold tracking-tight">{w.title}</p>
+                    <p className="text-xs text-muted-foreground">{relativeDay(w.date)}</p>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Weight trend */}
@@ -165,7 +218,7 @@ export default function ProgressPage() {
               type="number"
               inputMode="decimal"
               step="0.1"
-              placeholder={`${settings.weightKg}`}
+              placeholder={settings.weightKg ? `${settings.weightKg}` : "70.0"}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
@@ -183,7 +236,7 @@ export default function ProgressPage() {
       {/* Recent weigh-ins */}
       <div>
         <h2 className="mb-2 px-1 text-[17px] font-bold tracking-tight">Recent weigh-ins</h2>
-        {recent.length === 0 ? (
+        {recentWeights.length === 0 ? (
           <Card className="flex flex-col items-center gap-2 p-8 text-center">
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
               <Scale className="h-6 w-6" />
@@ -193,7 +246,7 @@ export default function ProgressPage() {
           </Card>
         ) : (
           <div className="flex flex-col gap-2.5">
-            {recent.map((e, i) => (
+            {recentWeights.map((e, i) => (
               <motion.div
                 key={e.date}
                 initial={{ opacity: 0, x: -8 }}

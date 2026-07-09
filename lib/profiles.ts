@@ -17,13 +17,6 @@ type ProfileSettingsSeed = {
   heightCm: number;
   weightKg: number;
   goal: string;
-  targets: {
-    calories: number;
-    protein: number;
-    waterMl: number;
-    steps: number;
-    sleepHours: number;
-  };
 };
 
 export type ProfileMeta = {
@@ -32,16 +25,12 @@ export type ProfileMeta = {
   /** "Alex" for Me, "" for Partner (no name shown). */
   greetingName: string;
   trainingStyle: string;
-  /** Show calorie + protein tracking (Me = yes, Partner = softer, off by default). */
-  showMacros: boolean;
   heroImage: string;
   /** Dedicated dark-mode hero image (cinematic dark asset; light mode keeps heroImage). */
   heroImageDark: string;
   heroTitle: string;
   heroSubtitle: string;
   workoutSubtitle: string;
-  nutritionEyebrow: string;
-  nutritionTitleNote: string;
   progressSubtitle: string;
   goalLine: string;
   /** Preset rest durations (seconds) offered in the timer. */
@@ -55,14 +44,11 @@ export const PROFILES: Record<ProfileId, ProfileMeta> = {
     label: "Me",
     greetingName: "Alex",
     trainingStyle: "Calisthenics",
-    showMacros: true,
     heroImage: "/assets/background_me_today_hero.jpg",
     heroImageDark: "/assets/futuristic_digital_human_silhouette.webp",
     heroTitle: "Today's workout",
     heroSubtitle: "Strength, muscle retention & fat loss",
     workoutSubtitle: "Your 5-day split",
-    nutritionEyebrow: "Two-meal cutting plan",
-    nutritionTitleNote: "Cutting plan",
     progressSubtitle: "Your cut, tracked",
     goalLine: "Cutting • Strength • Muscle retention",
     restPresets: [60, 90, 120],
@@ -72,7 +58,6 @@ export const PROFILES: Record<ProfileId, ProfileMeta> = {
       heightCm: 0,
       weightKg: 0,
       goal: "Cutting",
-      targets: { calories: 2100, protein: 150, waterMl: 2700, steps: 10000, sleepHours: 8 },
     },
   },
   partner: {
@@ -81,14 +66,11 @@ export const PROFILES: Record<ProfileId, ProfileMeta> = {
     label: "Partner",
     greetingName: "Eva",
     trainingStyle: "Eva's Pilates",
-    showMacros: false,
     heroImage: "/assets/background_partner_pilates_hero.jpg",
     heroImageDark: "/assets/serene_strength_in_motion.webp",
     heroTitle: "Today's workout",
     heroSubtitle: "Core, glutes, posture & mobility",
     workoutSubtitle: "Eva's Pilates flow",
-    nutritionEyebrow: "Healthy routine",
-    nutritionTitleNote: "Healthy routine",
     progressSubtitle: "Your practice, tracked",
     goalLine: "Tone • Mobility • Posture • Core strength",
     restPresets: [30, 45, 60],
@@ -98,8 +80,6 @@ export const PROFILES: Record<ProfileId, ProfileMeta> = {
       heightCm: 0,
       weightKg: 0,
       goal: "Tone & mobility",
-      // Partner is not on a calorie deficit — macros are hidden, water/steps/sleep only.
-      targets: { calories: 1800, protein: 90, waterMl: 2400, steps: 8000, sleepHours: 8 },
     },
   },
 };

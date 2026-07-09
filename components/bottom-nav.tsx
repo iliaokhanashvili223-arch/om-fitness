@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Dumbbell, Sprout, LineChart, Settings } from "lucide-react";
+import { Home, Dumbbell, LineChart, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { href: "/", label: "Today", icon: Home },
-  { href: "/workout", label: "Workout", icon: Dumbbell },
-  { href: "/nutrition", label: "Nutrition", icon: Sprout },
+  { href: "/workout", label: "Workouts", icon: Dumbbell },
   { href: "/progress", label: "Progress", icon: LineChart },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

@@ -12,13 +12,6 @@ export type Settings = {
   heightCm: number;
   weightKg: number;
   goal: string;
-  targets: {
-    calories: number;
-    protein: number;
-    waterMl: number;
-    steps: number;
-    sleepHours: number;
-  };
 };
 
 /** Per-profile default settings, seeded from lib/profiles.ts. */
@@ -29,44 +22,12 @@ export function defaultSettings(profile: ProfileId): Settings {
     heightCm: s.heightCm,
     weightKg: s.weightKg,
     goal: s.goal,
-    targets: { ...s.targets },
   };
 }
-
-export type DailyLog = {
-  waterMl: number;
-  sleepHours: number;
-  steps: number;
-  caloriesIn: number;
-  proteinIn: number;
-  mealsDone: Record<string, boolean>;
-};
-
-export const DEFAULT_DAILY: DailyLog = {
-  waterMl: 0,
-  sleepHours: 0,
-  steps: 0,
-  caloriesIn: 0,
-  proteinIn: 0,
-  mealsDone: {},
-};
 
 export type WeightEntry = { date: string; kg: number };
 
 export type WorkoutRecord = { date: string; dayId: string; title: string };
-
-/** A reusable food the user can one-tap add to today's calories + protein. */
-export type SavedFood = { id: string; name: string; kcal: number; protein: number };
-
-/** Starter saved foods so the "Saved foods" list is useful on day one. */
-export const DEFAULT_SAVED_FOODS: SavedFood[] = [
-  { id: "sf-eggs", name: "3 whole eggs", kcal: 210, protein: 18 },
-  { id: "sf-chicken", name: "Chicken breast (150g)", kcal: 250, protein: 46 },
-  { id: "sf-yogurt", name: "Greek yogurt (170g)", kcal: 100, protein: 17 },
-  { id: "sf-shake", name: "Protein shake", kcal: 130, protein: 25 },
-  { id: "sf-rice", name: "Rice (1 cup cooked)", kcal: 205, protein: 4 },
-  { id: "sf-banana", name: "Banana", kcal: 105, protein: 1 },
-];
 
 /** Set-completion map for a session: { [exerciseId]: boolean[] } */
 export type SessionProgress = Record<string, boolean[]>;
@@ -76,11 +37,9 @@ export type SessionProgress = Record<string, boolean[]>;
 
 const KEYS = {
   settings: (p: ProfileId) => `fos:${p}:settings`,
-  daily: (p: ProfileId, d: string) => `fos:${p}:daily:${d}`,
   weights: (p: ProfileId) => `fos:${p}:weights`,
   workouts: (p: ProfileId) => `fos:${p}:workouts`,
   session: (p: ProfileId, d: string, dayId: string) => `fos:${p}:session:${d}:${dayId}`,
-  foods: (p: ProfileId) => `fos:${p}:foods`,
 };
 
 /* ------------------------------ Core LS hook ------------------------------- */
@@ -96,9 +55,9 @@ function readRaw(key: string): string | null {
 
 /*
  * Same-tab sync bus. The browser's native `storage` event only fires in OTHER
- * tabs, so two hooks on the same key in ONE tab (e.g. the Today page + StepsCard
- * both holding the daily log) would drift and clobber each other's fields. This
- * registry lets every write notify sibling instances of the same key in-tab.
+ * tabs, so two hooks on the same key in ONE tab would drift and clobber each
+ * other's fields. This registry lets every write notify sibling instances of the
+ * same key in-tab.
  */
 const busListeners = new Map<string, Set<(raw: string) => void>>();
 function busNotify(key: string, raw: string, except: (raw: string) => void) {
@@ -197,11 +156,6 @@ export function useSettings() {
   return useLocalStorage<Settings>(KEYS.settings(profile), defaultSettings(profile));
 }
 
-export function useDailyLog(date: string = dateKey()) {
-  const { profile } = useProfile();
-  return useLocalStorage<DailyLog>(KEYS.daily(profile, date), DEFAULT_DAILY);
-}
-
 export function useWeights() {
   const { profile } = useProfile();
   const store = useLocalStorage<WeightEntry[]>(KEYS.weights(profile), []);
@@ -259,30 +213,6 @@ export function useWorkoutHistory() {
 export function useSession(dayId: string, date: string = dateKey()) {
   const { profile } = useProfile();
   return useLocalStorage<SessionProgress>(KEYS.session(profile, date, dayId), {});
-}
-
-/** Per-profile list of reusable foods, seeded with a few starters. */
-export function useSavedFoods() {
-  const { profile } = useProfile();
-  const store = useLocalStorage<SavedFood[]>(KEYS.foods(profile), DEFAULT_SAVED_FOODS);
-
-  const addFood = useCallback(
-    (name: string, kcal: number, protein: number) => {
-      const id = `sf-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${kcal}-${protein}`;
-      store.setValue((prev) => {
-        if (prev.some((f) => f.id === id)) return prev;
-        return [{ id, name, kcal, protein }, ...prev];
-      });
-    },
-    [store]
-  );
-
-  const removeFood = useCallback(
-    (id: string) => store.setValue((prev) => prev.filter((f) => f.id !== id)),
-    [store]
-  );
-
-  return { ...store, addFood, removeFood };
 }
 
 /* ------------------------------- Derived data ------------------------------ */

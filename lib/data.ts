@@ -1,9 +1,8 @@
 /**
- * Fitness OS — static program & nutrition data (per profile).
+ * Fitness OS — static program data (per profile).
  *
- * EDIT ME: everything a person trains and eats lives here.
+ * EDIT ME: everything a person trains lives here.
  *  - Workouts: ME_PROGRAM (calisthenics) and PARTNER_PROGRAM (Eva's Pilates routines).
- *  - Nutrition: ME_NUTRITION (2-meal cut) and PARTNER_NUTRITION (healthy routine).
  *
  * VIDEOS: exercises are matched to real YouTube tutorials by name via the
  * `exerciseVideos` map below. `withVideos()` attaches a derived `video` object
@@ -728,63 +727,6 @@ export function findWorkout(profile: ProfileId, dayId: string): WorkoutDay | und
   return getProgram(profile).find((d) => d.id === dayId);
 }
 
-/* ------------------------------- Nutrition -------------------------------- */
-
-export type Meal = {
-  id: string;
-  title: string;
-  time: string;
-  kcal: number;
-  protein: number;
-  components: { label: string; options: string[] }[];
-};
-
-export const ME_NUTRITION = {
-  calories: { min: 2000, max: 2200 },
-  protein: { min: 140, max: 160 },
-  waterLiters: { min: 2.5, max: 3 },
-  meals: [
-    {
-      id: "meal-1",
-      title: "Meal 1",
-      time: "Around midday",
-      kcal: 1050,
-      protein: 75,
-      components: [
-        { label: "Protein", options: ["Chicken", "Turkey", "Fish", "Eggs"] },
-        { label: "Carbs", options: ["Rice", "Potatoes"] },
-        { label: "Veg", options: ["Mixed vegetables", "Salad greens"] },
-        { label: "Fat", options: ["Olive oil (1 tbsp)"] },
-      ],
-    },
-    {
-      id: "meal-2",
-      title: "Meal 2",
-      time: "Evening",
-      kcal: 1050,
-      protein: 75,
-      components: [
-        { label: "Protein", options: ["Lean meat", "Fish", "Eggs", "Greek yogurt", "Cottage cheese"] },
-        { label: "Carbs", options: ["Rice", "Potatoes"] },
-        { label: "Veg", options: ["Mixed vegetables", "Salad greens"] },
-      ],
-    },
-  ] as Meal[],
-};
-
-export type NutritionPillar = { id: string; title: string; note: string };
-
-export const PARTNER_NUTRITION = {
-  waterLiters: { min: 2, max: 2.5 },
-  pillars: [
-    { id: "hydration", title: "Hydration", note: "Sip water steadily through the day." },
-    { id: "balanced", title: "Balanced meals", note: "Protein, veg and whole-food carbs." },
-    { id: "protein", title: "Protein support", note: "A protein source at each meal." },
-    { id: "energy", title: "Energy", note: "Eat enough to feel strong and light." },
-  ] as NutritionPillar[],
-};
-
-/** Back-compat alias used by anything still importing NUTRITION. */
-export const NUTRITION = ME_NUTRITION;
+/* ------------------------------ Back-compat ------------------------------- */
 export const PROGRAM = ME_PROGRAM;
 export const REST_DAYS = ME_REST_DAYS;

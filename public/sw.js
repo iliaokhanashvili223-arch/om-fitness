@@ -1,6 +1,6 @@
 /* Fitness OS service worker — offline support via stale-while-revalidate. */
-const CACHE = "fitness-os-v2";
-const PRECACHE = ["/", "/workout", "/nutrition", "/progress", "/settings", "/manifest.json"];
+const CACHE = "fitness-os-v3";
+const PRECACHE = ["/", "/workout", "/progress", "/settings", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

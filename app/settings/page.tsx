@@ -12,7 +12,6 @@ import {
   Share,
   Smartphone,
   Sun,
-  Target,
   User,
   Youtube,
 } from "lucide-react";
@@ -80,13 +79,12 @@ export default function SettingsPage() {
   const { value: settings, setValue: setSettings } = useSettings();
   const [confirmReset, setConfirmReset] = React.useState(false);
 
-  const goals = meta.showMacros
-    ? ["Cutting", "Maintaining", "Bulking"]
-    : ["Tone & mobility", "Strength", "Maintaining"];
+  const goals =
+    profile === "partner"
+      ? ["Tone & mobility", "Strength", "Maintaining"]
+      : ["Cutting", "Maintaining", "Bulking"];
 
   const update = (patch: Partial<Settings>) => setSettings((s) => ({ ...s, ...patch }));
-  const updateTargets = (patch: Partial<Settings["targets"]>) =>
-    setSettings((s) => ({ ...s, targets: { ...s.targets, ...patch } }));
 
   const resetData = () => {
     if (typeof window === "undefined") return;
@@ -197,38 +195,6 @@ export default function SettingsPage() {
               ))}
             </div>
           </div>
-        </div>
-      </Card>
-
-      {/* Targets */}
-      <Card className="p-5">
-        <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          <Target className="h-4 w-4" /> Daily targets
-        </h2>
-        <div className="mt-2 divide-y divide-border">
-          {meta.showMacros && (
-            <>
-              <FieldRow label="Calories" unit="kcal">
-                <NumberField value={settings.targets.calories} step={50} onChange={(n) => updateTargets({ calories: n })} />
-              </FieldRow>
-              <FieldRow label="Protein" unit="g">
-                <NumberField value={settings.targets.protein} step={5} onChange={(n) => updateTargets({ protein: n })} />
-              </FieldRow>
-            </>
-          )}
-          <FieldRow label="Water" unit="L">
-            <NumberField
-              value={+(settings.targets.waterMl / 1000).toFixed(2)}
-              step={0.25}
-              onChange={(n) => updateTargets({ waterMl: Math.round(n * 1000) })}
-            />
-          </FieldRow>
-          <FieldRow label="Steps" unit="">
-            <NumberField value={settings.targets.steps} step={500} onChange={(n) => updateTargets({ steps: n })} />
-          </FieldRow>
-          <FieldRow label="Sleep" unit="h">
-            <NumberField value={settings.targets.sleepHours} step={0.5} onChange={(n) => updateTargets({ sleepHours: n })} />
-          </FieldRow>
         </div>
       </Card>
 
