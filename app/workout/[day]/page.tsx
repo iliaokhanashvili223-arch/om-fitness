@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Activity, ArrowRight, CheckCircle2, Clock, RotateCcw, Zap } from "lucide-react";
+import { Activity, ArrowRight, CheckCircle2, Clock, Info, RotateCcw, Zap } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { ExerciseCard } from "@/components/exercise-card";
 import { PartnerRoutineDetail } from "@/components/partner-routine-detail";
@@ -12,7 +12,7 @@ import { RestTimerBar } from "@/components/rest-timer-bar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { findWorkout, type Exercise } from "@/lib/data";
+import { findWorkout, TRAINING_NOTE, type Exercise } from "@/lib/data";
 import { useProfile } from "@/components/profile-provider";
 import { useSession, useWorkoutHistory } from "@/lib/storage";
 
@@ -132,30 +132,62 @@ export default function WorkoutDetailPage() {
       {day.rounds && (
         <div className="mt-4 flex items-center gap-2 rounded-2xl bg-primary-soft px-4 py-3 text-sm font-medium text-primary">
           <Zap className="h-4 w-4 shrink-0" />
-          {day.rounds} rounds for time — check off each round as you go.
+          <span>
+            {day.rounds} rounds for time
+            {day.roundsRest ? ` · rest ${day.roundsRest} between rounds` : ""} — check off each round as
+            you go.
+          </span>
         </div>
       )}
 
+      {/* Training note — recoverable intensity reminder */}
+      <div className="mt-4 flex items-start gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-card">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+          <Info className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[13px] font-bold tracking-tight">Training note</p>
+          <p className="mt-0.5 text-[12.5px] leading-snug text-muted-foreground">{TRAINING_NOTE}</p>
+        </div>
+      </div>
+
       {/* Exercises */}
       <div className="mt-5 flex flex-col gap-3.5">
-        {day.exercises.map((ex, i) => (
-          <motion.div
-            key={ex.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: Math.min(i * 0.04, 0.3) }}
-          >
-            <ExerciseCard
-              exercise={ex}
-              index={i}
-              completed={completedFor(ex)}
-              done={!!session[ex.id]?.[0]}
-              onToggleSet={(setIndex) => toggleSet(ex, setIndex)}
-              onToggleDone={() => toggleDone(ex)}
-              onOpenVideo={() => setVideoExercise(ex)}
-            />
-          </motion.div>
-        ))}
+        {day.exercises.map((ex, i) => {
+          const prevGroup = i > 0 ? day.exercises[i - 1].group : undefined;
+          const showGroup = ex.group && ex.group !== prevGroup;
+          return (
+            <React.Fragment key={ex.id}>
+              {showGroup && (
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 px-1 pt-1">
+                  <span className="text-[12px] font-bold uppercase tracking-wide text-primary">
+                    {ex.group}
+                  </span>
+                  {ex.groupNote && (
+                    <span className="text-[12px] font-medium text-muted-foreground">
+                      {ex.groupNote}
+                    </span>
+                  )}
+                </div>
+              )}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i * 0.04, 0.3) }}
+              >
+                <ExerciseCard
+                  exercise={ex}
+                  index={i}
+                  completed={completedFor(ex)}
+                  done={!!session[ex.id]?.[0]}
+                  onToggleSet={(setIndex) => toggleSet(ex, setIndex)}
+                  onToggleDone={() => toggleDone(ex)}
+                  onOpenVideo={() => setVideoExercise(ex)}
+                />
+              </motion.div>
+            </React.Fragment>
+          );
+        })}
       </div>
 
       <RestTimerBar />

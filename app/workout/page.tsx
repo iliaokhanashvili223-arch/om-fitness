@@ -11,6 +11,8 @@ import {
   Footprints,
   HeartPulse,
   Moon,
+  RefreshCw,
+  TrendingUp,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PageContainer } from "@/components/page-container";
@@ -18,7 +20,7 @@ import { AppHeader } from "@/components/app-header";
 import { PartnerRoutineCard } from "@/components/partner-routine-card";
 import { VideoModal } from "@/components/video-modal";
 import { Card } from "@/components/ui/card";
-import { getProgram, getRestDays, type Exercise } from "@/lib/data";
+import { DELOAD_NOTE, PROGRESSION_TIPS, getProgram, getRestDays, type Exercise } from "@/lib/data";
 import { useProfile } from "@/components/profile-provider";
 import { PROFILES } from "@/lib/profiles";
 import { useWorkoutHistory } from "@/lib/storage";
@@ -187,6 +189,38 @@ export default function WorkoutListPage() {
           })}
         </div>
       </div>
+
+      {!isPartner && (
+        <div>
+          <p className="mb-2 mt-2 px-1 text-sm font-semibold text-muted-foreground">How to progress</p>
+          <Card className="p-4">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+                <TrendingUp className="h-4 w-4" />
+              </span>
+              <h3 className="text-[15px] font-bold tracking-tight">Weekly progression</h3>
+            </div>
+            <p className="mt-2.5 text-[12.5px] text-muted-foreground">
+              Each week, improve just one variable:
+            </p>
+            <ul className="mt-1.5 space-y-1">
+              {PROGRESSION_TIPS.map((tip) => (
+                <li key={tip} className="flex items-start gap-2 text-[13px] leading-snug">
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
+                  {tip}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-3 flex items-start gap-2 rounded-2xl bg-muted px-3 py-2.5">
+              <RefreshCw className="mt-0.5 h-4 w-4 shrink-0 text-purple" />
+              <p className="text-[12.5px] leading-snug text-muted-foreground">
+                <span className="font-semibold text-foreground">Deload · </span>
+                {DELOAD_NOTE}
+              </p>
+            </div>
+          </Card>
+        </div>
+      )}
 
       <VideoModal exercise={videoExercise} onClose={() => setVideoExercise(null)} />
     </PageContainer>

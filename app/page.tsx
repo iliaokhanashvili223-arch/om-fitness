@@ -9,7 +9,7 @@ import { AppHeader } from "@/components/app-header";
 import { HeroCard } from "@/components/hero-card";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { getRestDays, getProgram, workoutForDayIndex, type WorkoutDay } from "@/lib/data";
+import { getRestDays, getProgram, schemeLabel, workoutForDayIndex, type WorkoutDay } from "@/lib/data";
 import { useProfile } from "@/components/profile-provider";
 import { PROFILES } from "@/lib/profiles";
 import {
@@ -170,7 +170,7 @@ export default function TodayPage() {
                 </p>
                 <p className="mt-0.5 truncate text-[16px] font-bold tracking-tight">{nextEx.name}</p>
                 <p className="mt-0.5 text-[13px] font-medium text-muted-foreground">
-                  {isPartner ? nextEx.reps : `${nextEx.sets} × ${nextEx.reps}`}
+                  {isPartner ? nextEx.reps : schemeLabel(nextEx)}
                 </p>
                 {inProgress && <ProgressBar value={doneSets} max={totalSets} className="mt-2 h-1.5" />}
               </div>

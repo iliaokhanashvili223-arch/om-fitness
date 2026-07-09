@@ -3,7 +3,7 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink, X, Youtube } from "lucide-react";
-import type { Exercise } from "@/lib/data";
+import { schemeLabel, type Exercise } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 type VideoModalProps = {
@@ -109,7 +109,7 @@ export function VideoModal({ exercise, onClose }: VideoModalProps) {
                   </span>
                 )}
                 <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
-                  {exercise.scheme ?? `${exercise.sets} sets × ${exercise.reps}`}
+                  {schemeLabel(exercise)}
                 </span>
                 {muscles.map((muscle) => (
                   <span
