@@ -23,7 +23,7 @@ export function HeroCard({ day, progress, completed, resumed, heroImage, tint }:
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[2rem] border border-border shadow-card",
+        "hero-card relative overflow-hidden rounded-[2rem] border border-border shadow-card",
         tint === "partner"
           ? "bg-gradient-to-br from-purple-soft via-primary-soft/50 to-card"
           : "bg-gradient-to-br from-primary-soft via-primary-soft/55 to-card"
@@ -48,7 +48,7 @@ export function HeroCard({ day, progress, completed, resumed, heroImage, tint }:
               progress={completed ? 1 : progress}
               size={116}
               strokeWidth={11}
-              trackClassName="stroke-muted"
+              trackClassName="hero-ring-track"
               progressClassName={completed ? "stroke-success" : "stroke-primary"}
             >
               <span className="text-[26px] font-bold leading-none tracking-tight tabular-nums">
@@ -85,7 +85,7 @@ export function HeroCard({ day, progress, completed, resumed, heroImage, tint }:
           {day.focus.map((f) => (
             <span
               key={f}
-              className="rounded-full border border-border bg-card/80 px-3 py-1 text-[13px] font-semibold text-primary backdrop-blur-sm"
+              className="hero-chip rounded-full border border-border bg-card/80 px-3 py-1 text-[13px] font-semibold text-primary backdrop-blur-sm"
             >
               {f}
             </span>
